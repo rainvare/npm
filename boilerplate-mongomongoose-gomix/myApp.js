@@ -41,7 +41,15 @@
 
 // <Your code here >
 
-var Person /* = <Your Model> */
+var Schema = mongoose.Schema;
+
+var personSchema = new Schema({
+  name: { type: String, required: true },
+  age: Number,
+  favoriteFoods: [String]
+});
+
+var Person = mongoose.model('Person', personSchema); /* = <Your Model> */
 
 // **Note**: Glitch is a real server, and in real servers interactions with
 // the db are placed in handler functions, to be called when some event happens
@@ -79,9 +87,12 @@ var Person /* = <Your Model> */
 // });
 
 var createAndSavePerson = function(done) {
-  
-  done(null /*, data*/);
-
+  let person = new Person({
+    name: 'Name',
+    age: '20',
+    favoriteFoods: ['favoriteFood1', 'favoriteFood2']
+  });
+  person.save((err, data) => (err ? done(err) : done(null, data)));
 };
 
 /** 4) Create many People with `Model.create()` */
@@ -94,9 +105,7 @@ var createAndSavePerson = function(done) {
 // 'arrayOfPeople'.
 
 var createManyPeople = function(arrayOfPeople, done) {
-    
-    done(null/*, data*/);
-    
+    Person.create(arrayOfPeople, (err, data) => (err ? done(err) : done(null, data)));
 };
 
 /** # C[R]UD part II - READ #
@@ -111,9 +120,7 @@ var createManyPeople = function(arrayOfPeople, done) {
 // Use the function argument `personName` as search key.
 
 var findPeopleByName = function(personName, done) {
-  
-  done(null/*, data*/);
-
+  Person.find({ name: personName }, (err, data) => (err ? done(err) : done(null, data)));
 };
 
 /** 6) Use `Model.findOne()` */
@@ -126,10 +133,9 @@ var findPeopleByName = function(personName, done) {
 // argument `food` as search key
 
 var findOneByFood = function(food, done) {
-
-  done(null/*, data*/);
-  
+  Person.findOne({ favoriteFoods: food }, (err, data) => (err ? done(err) : done(null, data)));
 };
+
 
 /** 7) Use `Model.findById()` */
 
