@@ -180,7 +180,14 @@ var findPersonById = function(personId, done) {
 var findEditThenSave = function(personId, done) {
   var foodToAdd = 'hamburger';
   
-  done(null/*, data*/);
+  Person.findById(personId, function(err, data) {
+    if (err) {
+      return done(err);
+    } else {
+      data['favoriteFoods'].push(foodToAdd);
+      data.save((err, data) => (err ? done(err) : done(null, data)));
+    }
+  });
 };
 
 /** 9) New Update : Use `findOneAndUpdate()` */
@@ -201,10 +208,23 @@ var findEditThenSave = function(personId, done) {
 var findAndUpdate = function(personName, done) {
   var ageToSet = 20;
 
-  done(null/*, data*/);
-};
-
-/** # CRU[D] part IV - DELETE #
+  Person.findOneAndUpdate(
+    {
+      name: personName
+    },
+    {
+      $set: {age: ageToSet}
+    },
+    {
+      new: true
+    },
+    (err, data) => 
+    {
+      if (err) return done(err, data); 
+      return done(null, data);
+    }
+  );
+};/** # CRU[D] part IV - DELETE #
 /*  =========================== */
 
 /** 10) Delete one Person */
@@ -213,14 +233,17 @@ var findAndUpdate = function(personName, done) {
 // `findByIdAndRemove()` or `findOneAndRemove()`. They are similar to the
 // previous update methods. They pass the removed document to the cb.
 // As usual, use the function argument `personId` as search key.
-
-var removeById = function(personId, done) {
-  
-  done(null/*, data*/);
-    
+var removeById = function(personId, done) 
+{
+  Person.findByIdAndRemove(personId, (err, data) => err ? done(err) : done(null, data));
 };
 
 /** 11) Delete many People */
+
+var removeManyPeople = function(done) {
+  var nameToRemove = "Mary";
+  Person.remove({name: nameToRemove},(err,data) => err ? done(err) : done(null, data));
+};
 
 // `Model.remove()` is useful to delete all the documents matching given criteria.
 // Delete all the people whose name is "Mary", using `Model.remove()`.
@@ -230,11 +253,8 @@ var removeById = function(personId, done) {
 // containing the outcome of the operation, and the number of items affected.
 // Don't forget to pass it to the `done()` callback, since we use it in tests.
 
-var removeManyPeople = function(done) {
-  var nameToRemove = "Mary";
 
-  done(null/*, data*/);
-};
+
 
 /** # C[R]UD part V -  More about Queries # 
 /*  ======================================= */
@@ -253,13 +273,22 @@ var removeManyPeople = function(done) {
 // Limit the results to two documents, and hide their age.
 // Chain `.find()`, `.sort()`, `.limit()`, `.select()`, and then `.exec()`,
 // passing the `done(err, data)` callback to it.
-
-var queryChain = function(done) {
+var queryChain = function(done) 
+{
   var foodToSearch = "burrito";
-  
-  done(null/*, data*/);
-};
 
+  var mychain = Person.find({favoriteFoods: foodToSearch})
+  mychain.sort({name: 'asc'}).limit(2).select({name: 1})
+    .exec(function(err,data){
+    if (err){
+      console.log(err)
+      done(err) 
+    } 
+    else{ 
+      done(null,data) 
+    } 
+  });
+};
 /** **Well Done !!**
 /* You completed these challenges, let's go celebrate !
  */
